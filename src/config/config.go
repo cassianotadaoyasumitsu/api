@@ -16,14 +16,14 @@ var (
 
 // Inicializa variaveis de ambiente
 func Load() {
-	var erro error
+	var err error
 
-	if erro = godotenv.Load(); erro != nil {
-		log.Fatal(erro)
+	if err = godotenv.Load(); err != nil {
+		log.Fatal(err)
 	}
 
-	APIDoor, erro = strconv.Atoi(os.Getenv("API_DOOR"))
-	if erro != nil {
+	APIDoor, err = strconv.Atoi(os.Getenv("API_DOOR"))
+	if err != nil {
 		APIDoor = 9001
 	}
 
