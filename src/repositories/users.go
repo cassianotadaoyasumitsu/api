@@ -3,6 +3,7 @@ package repositories
 import (
 	"api/src/model"
 	"database/sql"
+	"fmt"
 )
 
 // Representa repo
@@ -34,4 +35,67 @@ func (repo users) Create(user model.User) (uint64, error) {
 	}
 
 	return uint64(lastIDInserted), nil
+}
+
+// Busca usuários no DB por filtro name nick
+func (repo users) Search(nameOrNick string) ([]model.User, error) {
+	nameOrNick = fmt.Sprintf("%%%s%%", nameOrNick) // %nameOrNick%
+
+	lines, err := repo.db.Query(
+		"select id, name, nick, email, created_at from users where name LIKE ? or nick LIKE ?",
+		nameOrNick, nameOrNick,
+	)
+
+	if err != nil {
+		return nil, err
+	}
+	defer lines.Close()
+
+	var users []model.User
+
+	for lines.Next() {
+		var user model.User
+
+		if err = lines.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Nick,
+			&user.Email,
+			&user.Created_at,
+		); err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
+// Busca usuário por ID
+func (repo users) SearchByID(ID uint64) (model.User, error) {
+	lines, err := repo.db.Query(
+		"select id, name, nick, email, created_at from users where id = ?",
+		ID,
+	)
+	if err != nil {
+		return model.User{}, err
+	}
+	defer lines.Close()
+
+	var user model.User
+
+	if lines.Next() {
+		if err = lines.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Nick,
+			&user.Email,
+			&user.Created_at,
+		); err != nil {
+			return model.User{}, err
+		}
+	}
+
+	return user, nil
 }
