@@ -17,6 +17,7 @@ type Route struct {
 // Coloca rotas no router
 func Config(r *mux.Router) *mux.Router {
 	routes := usersRoutes
+	routes = append(routes, LoginRoute)
 
 	for _, route := range routes {
 		r.HandleFunc(route.URI, route.Function).Methods(route.Method)

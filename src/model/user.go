@@ -1,9 +1,12 @@
 package model
 
 import (
+	"api/src/security"
 	"errors"
 	"strings"
 	"time"
+
+	"github.com/badoux/checkmail"
 )
 
 // User model
@@ -17,16 +20,18 @@ type User struct {
 }
 
 // Chama metodods de validação do Usuário
-func (user *User) Preparar() error {
-	if err := user.validar(); err != nil {
+func (user *User) Preparar(step string) error {
+	if err := user.validar(step); err != nil {
 		return err
 	}
 
-	user.formatar()
+	if err := user.formatar(step); err != nil {
+		return err
+	}
 	return nil
 }
 
-func (user *User) validar() error {
+func (user *User) validar(step string) error {
 	if user.Name == "" {
 		return errors.New("name demanded, can't be blank")
 	}
@@ -39,15 +44,31 @@ func (user *User) validar() error {
 		return errors.New("email demanded, can't be blank")
 	}
 
-	if user.Password == "" {
+	if err := checkmail.ValidateFormat(user.Email); err != nil {
+		return errors.New("email format invalid")
+		// return err
+	}
+
+	if step == "register" && user.Password == "" {
 		return errors.New("password demanded, can't be blank")
 	}
 
 	return nil
 }
 
-func (user *User) formatar() {
+func (user *User) formatar(step string) error {
 	user.Name = strings.TrimSpace(user.Name)
 	user.Nick = strings.TrimSpace(user.Nick)
 	user.Email = strings.TrimSpace(user.Email)
+
+	if step == "register" {
+		hashPassword, err := security.Hash(user.Password)
+		if err != nil {
+			return err
+		}
+
+		user.Password = string(hashPassword)
+	}
+
+	return nil
 }

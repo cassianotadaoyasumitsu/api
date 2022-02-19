@@ -1,4 +1,5 @@
 -- mysql -u golang -p
+-- password = golang
 
 CREATE DATABASE IF NOT EXIST devbook;
 USE devbook;
@@ -10,6 +11,6 @@ CREATE TABLE users(
   name varchar(50) not null,
   nick varchar(50) not null unique,
   email varchar(50) not null unique,
-  password varchar(20) not null,
+  password varchar(100) not null,
   created_at timestamp default current_timestamp()
 ) ENGINE=INNODB;
