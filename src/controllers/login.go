@@ -1,12 +1,14 @@
 package controllers
 
 import (
+	"api/src/auth"
 	"api/src/db"
 	"api/src/model"
 	"api/src/repositories"
 	"api/src/responses"
 	"api/src/security"
 	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"net/http"
 )
@@ -43,5 +45,7 @@ func Login(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	w.Write([]byte("logged in"))
+	token, _ := auth.TokenCreate(dbUserSaved.ID)
+	fmt.Println(token)
+	w.Write([]byte(token))
 }
