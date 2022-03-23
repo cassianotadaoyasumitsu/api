@@ -180,3 +180,61 @@ func (repo Users) Unfollow(followerID, userID uint64) error {
 
 	return nil
 }
+
+// Get followers
+func (repo Users) GetFollowers(userID uint64) ([]model.User, error) {
+	lines, err := repo.db.Query("select id, name, nick, email, created_at from users where id in (select follower_id from followers where user_id = ?)", userID)
+	if err != nil {
+		return nil, err
+	}
+	defer lines.Close()
+
+	var users []model.User
+
+	for lines.Next() {
+		var user model.User
+
+		if err = lines.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Nick,
+			&user.Email,
+			&user.Created_at,
+		); err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}
+
+// Get following
+func (repo Users) GetFollowing(userID uint64) ([]model.User, error) {
+	lines, err := repo.db.Query("select id, name, nick, email, created_at from users where id in (select user_id from followers where follower_id = ?)", userID)
+	if err != nil {
+		return nil, err
+	}
+	defer lines.Close()
+
+	var users []model.User
+
+	for lines.Next() {
+		var user model.User
+
+		if err = lines.Scan(
+			&user.ID,
+			&user.Name,
+			&user.Nick,
+			&user.Email,
+			&user.Created_at,
+		); err != nil {
+			return nil, err
+		}
+
+		users = append(users, user)
+	}
+
+	return users, nil
+}
