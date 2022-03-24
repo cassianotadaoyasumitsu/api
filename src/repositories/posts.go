@@ -33,3 +33,60 @@ func (repo Posts) Create(post model.Post) (uint64, error) {
 
 	return uint64(lastInsertId), nil
 }
+
+// Search posts by user id
+func (repo Posts) SearchByID(postID uint64) (model.Post, error) {
+	line, err := repo.db.Query("select p.*, u.nick from posts p inner join users u on u.id = p.author_id where p.id = ?", postID)
+	if err != nil {
+		return model.Post{}, err
+	}
+	defer line.Close()
+
+	var post model.Post
+
+	if line.Next() {
+		if err = line.Scan(
+			&post.ID,
+			&post.Title,
+			&post.Content,
+			&post.AuthorID,
+			&post.Likes,
+			&post.Created_at,
+			&post.AuthorNick,
+		); err != nil {
+			return model.Post{}, err
+		}
+	}
+
+	return post, nil
+}
+
+// Search posts
+func (repo Posts) Search(userID uint64) ([]model.Post, error) {
+	lines, err := repo.db.Query("select distinct p.*, u.nick from posts p inner join users u on u.id = p.author_id inner join followers s on p.author_id = s.user_id where u.id = ? or s.follower_id = ? order by 1 desc", userID, userID)
+	if err != nil {
+		return nil, err
+	}
+	defer lines.Close()
+
+	var posts []model.Post
+
+	for lines.Next() {
+		var post model.Post
+		if err = lines.Scan(
+			&post.ID,
+			&post.Title,
+			&post.Content,
+			&post.AuthorID,
+			&post.Likes,
+			&post.Created_at,
+			&post.AuthorNick,
+		); err != nil {
+			return nil, err
+		}
+
+		posts = append(posts, post)
+	}
+
+	return posts, nil
+}
