@@ -341,6 +341,11 @@ func PasswordUpdate(w http.ResponseWriter, r *http.Request) {
 	}
 
 	requestBody, err := ioutil.ReadAll(r.Body)
+	if err != nil {
+		responses.Err(w, http.StatusBadRequest, err)
+		return
+	}
+
 	var password model.Password
 	if err = json.Unmarshal(requestBody, &password); err != nil {
 		responses.Err(w, http.StatusBadRequest, err)
