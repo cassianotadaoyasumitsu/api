@@ -121,6 +121,7 @@ func (repo Posts) Delete(postID uint64) error {
 	return nil
 }
 
+// Search posts by user id
 func (repo Posts) SearchByUserID(userID uint64) ([]model.Post, error) {
 	lines, err := repo.db.Query("select p.*, u.nick from posts p inner join users u on u.id = p.author_id where p.author_id = ? order by 1 desc", userID)
 	if err != nil {
@@ -148,4 +149,19 @@ func (repo Posts) SearchByUserID(userID uint64) ([]model.Post, error) {
 	}
 
 	return posts, nil
+}
+
+// Like post
+func (repo Posts) Like(postID uint64) error {
+	statement, err := repo.db.Prepare("UPDATE posts SET likes = likes + 1 WHERE id = ?")
+	if err != nil {
+		return err
+	}
+	defer statement.Close()
+
+	if _, err = statement.Exec(postID); err != nil {
+		return err
+	}
+
+	return nil
 }
