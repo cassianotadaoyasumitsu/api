@@ -25,7 +25,7 @@ func Load() {
 
 	APIDoor, err = strconv.Atoi(os.Getenv("API_DOOR"))
 	if err != nil {
-		APIDoor = 9001
+		APIDoor = 3000
 	}
 
 	StringConnectionDB = fmt.Sprintf("%s:%s@/%s?charset=utf8&parseTime=True&loc=Local",
