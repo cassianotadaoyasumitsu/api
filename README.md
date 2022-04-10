@@ -21,7 +21,7 @@ Allow us to create an account, publish posts, follow users, give likes and so fa
 
 Example of:
 
-````
+```
 
 // 20220410233629
 // https://raw.githubusercontent.com/cassianotadaoyasumitsu/api/master/Devbook.postman_collection.json
@@ -647,3 +647,4 @@ Example of:
   ]
 }
 
+``` 
